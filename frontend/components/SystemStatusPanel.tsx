@@ -1,7 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-
 import { SystemStatus } from '@/app/page';
 
 interface SystemStatusPanelProps {
@@ -59,6 +57,14 @@ export default function SystemStatusPanel({ status }: SystemStatusPanelProps) {
             {status.anomaly_detected ? "🔴 ALERT" : "🟢 NORMAL"}
           </span>
         </div>
+
+        {/* НОВЫЕ ПОЛЯ */}
+        <div className="flex items-center justify-between">
+          <span className="text-slate-300">AI Model</span>
+          <span className={status.ai_model_trained ? "text-green-400" : "text-yellow-400"}>
+            {status.ai_model_trained ? "🟢 TRAINED" : "🟡 TRAINING"}
+          </span>
+        </div>
       </div>
 
       {/* Индикаторы */}
@@ -87,6 +93,56 @@ export default function SystemStatusPanel({ status }: SystemStatusPanelProps) {
               style={{ width: `${Math.min(status.temperature / 100 * 100, 100)}%` }}
             ></div>
           </div>
+        </div>
+
+        {/* НОВЫЙ ИНДИКАТОР - ПРОГРЕСС АТАКИ */}
+        {status.under_attack && (
+          <div>
+            <div className="flex justify-between text-sm text-slate-400 mb-1">
+              <span>Attack Progress</span>
+              <span>{status.attack_progress}%</span>
+            </div>
+            <div className="w-full bg-slate-700 rounded-full h-2">
+              <div 
+                className="bg-red-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${status.attack_progress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+
+        {/* НОВЫЙ ИНДИКАТОР - УВЕРЕННОСТЬ AI */}
+        {status.anomaly_detected && (
+          <div>
+            <div className="flex justify-between text-sm text-slate-400 mb-1">
+              <span>AI Confidence</span>
+              <span>{(status.anomaly_confidence * 100).toFixed(1)}%</span>
+            </div>
+            <div className="w-full bg-slate-700 rounded-full h-2">
+              <div 
+                className="bg-purple-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${Math.abs(status.anomaly_confidence) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* СТАТУС AI */}
+      <div className="mt-4 pt-4 border-t border-slate-700/50">
+        <div className="text-xs text-slate-400">
+          <div className="flex justify-between">
+            <span>AI Status:</span>
+            <span className={status.ai_model_trained ? "text-green-400" : "text-yellow-400"}>
+              {status.ai_model_trained ? "Ready" : "Learning normal patterns..."}
+            </span>
+          </div>
+          {status.anomaly_detected && (
+            <div className="flex justify-between mt-1">
+              <span>Anomaly Score:</span>
+              <span className="text-red-400">{status.anomaly_confidence.toFixed(3)}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
